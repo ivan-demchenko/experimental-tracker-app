@@ -5,11 +5,19 @@ angular.module('starter.controllers', [])
 
   $scope.logData = LogsService.fetch($scope.offset);
 
+  this.logTabSelected = function() {
+    $scope.offset = 0;
+    $scope.logData = LogsService.fetch($scope.offset);
+  };
+
   this.getViewTitle = function() {
     return 'Log: ' + moment().add($scope.offset, 'd').format('DD.MM.YY');
   };
 
   this.showDay = function(offset) {
+    if ((offset === -1 && $scope.logData.yesterday === null) || (offset === +1 && $scope.logData.tomorrow === null)) {
+      return;
+    }
     if (offset === 0) {
       $scope.offset = 0;
     } else {

@@ -3,7 +3,6 @@
   "private": "true",
   "devDependencies": {
     "ionic": "driftyco/ionic-bower#1.2.4",
-    "font-awesome": "^4.5.0",
     "moment": "^2.12.0"
   }
 }

@@ -1,4 +1,4 @@
-<ion-view view-title="{{ LogC.getViewTitle() }}">
+<ion-view on-swipe-right="LogC.showDay(-1)" on-swipe-left="LogC.showDay(+1)" view-title="{{ LogC.getViewTitle() }}">
   <ion-content>
     <div class="button-bar">
       <a class="button button-positive button-small" ng-click="LogC.showDay(-1)" ng-disabled="logData.yesterday === null">Prev. day</a>
