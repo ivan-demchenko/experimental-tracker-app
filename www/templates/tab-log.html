@@ -1,0 +1,9 @@
+<ion-view view-title="Log">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="item in logData track by $index">
+        <ng-include src="'/templates/log-items/' + item.type + '.html'"></ng-include>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
