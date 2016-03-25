@@ -1,7 +1,22 @@
 angular.module('starter.controllers', [])
 
-.controller('LogCtrl', function($scope, LogsService) {
-  $scope.logData = LogsService.fetch();
+.controller('LogCtrl', function($scope, LogsService, moment) {
+  $scope.offset = 0;
+
+  $scope.logData = LogsService.fetch($scope.offset);
+
+  this.getViewTitle = function() {
+    return 'Log: ' + moment().add($scope.offset, 'd').format('DD.MM.YY');
+  };
+
+  this.showDay = function(offset) {
+    if (offset === 0) {
+      $scope.offset = 0;
+    } else {
+      $scope.offset += offset;
+    }
+    $scope.logData = LogsService.fetch($scope.offset);
+  };
 
   LogsService.onAdd(function(items) {
     $scope.logData = items;
@@ -39,20 +54,20 @@ angular.module('starter.controllers', [])
       LogsService.add({
         type: 'poop',
         comments: res
-      });
+      }, 0);
     });
   };
 
   this.addPee = function() {
     LogsService.add({
       type: 'pee'
-    });
+    }, 0);
   };
 
   this.addBreastFeeding = function() {
     LogsService.add({
       type: 'breastFeeding'
-    });
+    }, 0);
   };
 
   this.addFormula = function() {
@@ -80,7 +95,7 @@ angular.module('starter.controllers', [])
       LogsService.add({
         type: 'formula',
         amount: res
-      });
+      }, 0);
     });
   };
 

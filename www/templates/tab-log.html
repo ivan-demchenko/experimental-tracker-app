@@ -1,7 +1,12 @@
-<ion-view view-title="Log">
+<ion-view view-title="{{ LogC.getViewTitle() }}">
   <ion-content>
+    <div class="button-bar">
+      <a class="button button-positive button-small" ng-click="LogC.showDay(-1)" ng-disabled="logData.yesterday === null">Yesterday</a>
+      <a class="button button-positive button-small" ng-click="LogC.showDay(0)">Today</a>
+      <a class="button button-positive button-small" ng-click="LogC.showDay(1)" ng-disabled="logData.tomorrow === null">Tomorrow</a>
+    </div>
     <ion-list>
-      <ion-item ng-repeat="item in logData track by $index">
+      <ion-item ng-repeat="item in logData.today track by $index">
         <ng-include src="'/templates/log-items/' + item.type + '.html'"></ng-include>
       </ion-item>
     </ion-list>
