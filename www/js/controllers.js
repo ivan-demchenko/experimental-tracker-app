@@ -1,13 +1,28 @@
 angular.module('starter.controllers', [])
 
-.controller('LogCtrl', function($scope, LogsService, moment) {
+.controller('LogCtrl', function($q, $scope, LogsService, moment) {
   $scope.offset = 0;
+  $scope.logData = [];
+  $scope.isPrevDayAvailable = false;
+  $scope.isNextDayAvailable = false;
 
-  $scope.logData = LogsService.fetch($scope.offset);
+  this.updateLogs = function() {
+    $q.all([
+      LogsService.fetch($scope.offset),
+      LogsService.isLogsDataAvailable($scope.offset - 1),
+      LogsService.isLogsDataAvailable($scope.offset + 1)
+    ]).then(function(res) {
+      $scope.logData = res[0];
+      $scope.isPrevDayAvailable = res[1];
+      $scope.isNextDayAvailable = res[2];
+    });
+  }
+
+  this.updateLogs();
 
   this.logTabSelected = function() {
     $scope.offset = 0;
-    $scope.logData = LogsService.fetch($scope.offset);
+    this.updateLogs();
   };
 
   this.getViewTitle = function() {
@@ -23,28 +38,29 @@ angular.module('starter.controllers', [])
     } else {
       $scope.offset += offset;
     }
-    $scope.logData = LogsService.fetch($scope.offset);
+    this.updateLogs();
   };
 
   LogsService.onAdd(function(items) {
     $scope.logData = items;
   });
+
 })
 
-.controller('InsertCtrl', function($scope, LogsService, $ionicPopup) {
+.controller('InsertCtrl', function($scope, $state, LogsService, $ionicPopup) {
 
   $scope.dialogs = {
     poop: {
       comments: ''
     },
     formula: {
-      amount: 0
+      amount: ''
     }
   }
 
   this.addPoop = function() {
     $ionicPopup.show({
-      template: '<input type="text" ng-model="dialogs.poop.comments">',
+      template: '<input type="text" autofocus ng-model="dialogs.poop.comments">',
       title: 'Any comments?',
       subTitle: 'Colour, consistency, etc.',
       scope: $scope,
@@ -58,29 +74,35 @@ angular.module('starter.controllers', [])
           }
         }
       ]
-    }).then(function(res) {
-      LogsService.add({
-        type: 'poop',
-        comments: res
-      }, 0);
+    })
+    .then(function(res) {
+      return LogsService.add({ type: 'poop', comments: res }, 0);
+    })
+    .then(function() {
+      $scope.dialogs.poop.comments = '';
+      $state.go('tab.log');
     });
   };
 
   this.addPee = function() {
-    LogsService.add({
-      type: 'pee'
-    }, 0);
+    LogsService.add({ type: 'pee' }, 0)
+    .then(function() {
+      $scope.dialogs.poop.comments = '';
+      $state.go('tab.log');
+    });
   };
 
   this.addBreastFeeding = function() {
-    LogsService.add({
-      type: 'breastFeeding'
-    }, 0);
+    LogsService.add({ type: 'breastFeeding' }, 0)
+    .then(function() {
+      $scope.dialogs.poop.comments = '';
+      $state.go('tab.log');
+    });
   };
 
   this.addFormula = function() {
     $ionicPopup.show({
-      template: '<input type="number" step="10" ng-model="dialogs.formula.amount">',
+      template: '<input type="number" autofocus step="10" ng-model="dialogs.formula.amount">',
       title: 'Enter amount on formula',
       subTitle: 'In milliliters',
       scope: $scope,
@@ -99,12 +121,14 @@ angular.module('starter.controllers', [])
           }
         }
       ]
-    }).then(function(res) {
-      LogsService.add({
-        type: 'formula',
-        amount: res
-      }, 0);
-    });
+    })
+    .then(function(res) {
+      return LogsService.add({ type: 'formula', amount: res }, 0);
+    })
+    .then(function() {
+      $scope.dialogs.formula.amount = '';
+      $state.go('tab.log');
+    });;
   };
 
 });

@@ -1,13 +1,13 @@
 <ion-view on-swipe-right="LogC.showDay(-1)" on-swipe-left="LogC.showDay(+1)" view-title="{{ LogC.getViewTitle() }}">
   <ion-content>
     <div class="button-bar">
-      <a class="button button-positive button-small" ng-click="LogC.showDay(-1)" ng-disabled="logData.yesterday === null">Prev. day</a>
+      <a class="button button-positive button-small" ng-click="LogC.showDay(-1)" ng-disabled="!isPrevDayAvailable">Prev. day</a>
       <a class="button button-positive button-small" ng-click="LogC.showDay(0)">Today</a>
-      <a class="button button-positive button-small" ng-click="LogC.showDay(1)" ng-disabled="logData.tomorrow === null">Next day</a>
+      <a class="button button-positive button-small" ng-click="LogC.showDay(1)" ng-disabled="!isNextDayAvailable">Next day</a>
     </div>
     <ion-list>
-      <ion-item ng-repeat="item in logData.today track by $index">
-        <ng-include src="'/templates/log-items/' + item.type + '.html'"></ng-include>
+      <ion-item ng-repeat="item in logData track by $index">
+        <ng-include src="'templates/log-items/' + item.type + '.html'"></ng-include>
       </ion-item>
     </ion-list>
   </ion-content>

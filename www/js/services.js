@@ -12,42 +12,44 @@ angular.module('starter.services', [])
 
 })
 
-.service('LogsService', function($window, HelpersService) {
+.service('Storage', function($q, $window) {
+  this.set = function(key, val) {
+    $window.localStorage.setItem(key, JSON.stringify(val));
+    return $q.when(val);
+  };
+  this.get = function(key) {
+    return $q.when(JSON.parse($window.localStorage.getItem(key) || '[]'));
+  };
+})
+
+.service('LogsService', function($q, Storage, HelpersService) {
   // What would happen when user added an item to the log
   this.onAddCB = null;
 
+  this.isLogsDataAvailable = function(offset) {
+    return Storage
+      .get(HelpersService.getLogFileName(offset))
+      .then(function(data) { return data.length > 0; });
+  };
+
   this.fetch = function(offset) {
-
-    return [-1, 0, +1].map(function(x) {
-      return HelpersService.getLogFileName(offset + x);
-    }).map(function(key) {
-      return JSON.parse($window.localStorage.getItem(key) || '[]');
-    }).map(function(data) {
-      return data.length ? data : null;
-    }).reduce(function(res, data, idx) {
-      var key = ({ 0: 'yesterday', 1: 'today', 2: 'tomorrow' })[idx];
-      res[key] = data;
-      return res;
-    }, {});
-
+    return Storage.get(HelpersService.getLogFileName(offset))
   };
 
   this.save = function(items, offset) {
-    var key = HelpersService.getLogFileName(offset);
-    $window.localStorage.setItem(key, JSON.stringify(items));
+    return Storage.set(HelpersService.getLogFileName(offset), items);
   };
 
   this.add = function(item, offset) {
-    item.time = new Date().getTime();
-    var items = this.fetch(offset);
-    if (!items.today) {
-      items.today = [];
-    }
-    items.today.unshift(item);
-    this.save(items.today, 0);
-    if (this.onAddCB) {
-      this.onAddCB(items);
-    }
+    return this.fetch(offset)
+    .then(function(items) {
+      item.time = new Date().getTime();
+      items.unshift(item);
+      return this.save(items, 0);
+    }.bind(this))
+    .then(function(items) {
+      return !!this.onAddCB && this.onAddCB(items);
+    }.bind(this));
   };
 
   this.onAdd = function(cb) {
