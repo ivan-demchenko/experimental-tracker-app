@@ -1,36 +1,14 @@
 angular.module('starter.controllers', [])
 
-.controller('LogCtrl', function($q, $scope, LogsService, moment) {
+.controller('LogCtrl', function($scope, LogsService, moment) {
+  $scope.viewTitle = '-/-';
   $scope.offset = 0;
   $scope.logData = [];
   $scope.isPrevDayAvailable = false;
   $scope.isNextDayAvailable = false;
 
-  this.updateLogs = function() {
-    $q.all([
-      LogsService.fetch($scope.offset),
-      LogsService.isLogsDataAvailable($scope.offset - 1),
-      LogsService.isLogsDataAvailable($scope.offset + 1)
-    ]).then(function(res) {
-      $scope.logData = res[0];
-      $scope.isPrevDayAvailable = res[1];
-      $scope.isNextDayAvailable = res[2];
-    });
-  }
-
-  this.updateLogs();
-
-  this.logTabSelected = function() {
-    $scope.offset = 0;
-    this.updateLogs();
-  };
-
-  this.getViewTitle = function() {
-    return 'Log: ' + moment().add($scope.offset, 'd').format('DD.MM.YY');
-  };
-
   this.showDay = function(offset) {
-    if ((offset === -1 && $scope.logData.yesterday === null) || (offset === +1 && $scope.logData.tomorrow === null)) {
+    if ((offset < 0 && !$scope.isPrevDayAvailable) || (offset > 0 && !$scope.isNextDayAvailable)) {
       return;
     }
     if (offset === 0) {
@@ -38,7 +16,19 @@ angular.module('starter.controllers', [])
     } else {
       $scope.offset += offset;
     }
-    this.updateLogs();
+    LogsService.getDaysLogsData(offset).then(function(res) {
+      $scope.viewTitle = 'Log: ' + moment().add($scope.offset, 'd').format('DD.MM.YY');
+      $scope.logData = res.logs;
+      $scope.isPrevDayAvailable = res.prevDayAvailable;
+      $scope.isNextDayAvailable = res.nextDayAvailable;
+    });
+  };
+
+  this.showDay($scope.offset);
+
+  this.logTabSelected = function() {
+    $scope.offset = 0;
+    this.showDay($scope.offset);
   };
 
   LogsService.onAdd(function(items) {

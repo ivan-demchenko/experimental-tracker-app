@@ -32,6 +32,20 @@ angular.module('starter.services', [])
       .then(function(data) { return data.length > 0; });
   };
 
+  this.getDaysLogsData = function(offset) {
+    return $q.all([
+      this.fetch(offset),
+      this.isLogsDataAvailable(offset - 1),
+      this.isLogsDataAvailable(offset + 1)
+    ]).then(function(res) {
+      return {
+        logs: res[0],
+        prevDayAvailable: res[1],
+        nextDayAvailable: res[2]
+      };
+    });
+  }
+
   this.fetch = function(offset) {
     return Storage.get(HelpersService.getLogFileName(offset))
   };
