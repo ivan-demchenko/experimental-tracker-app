@@ -77,7 +77,6 @@ angular.module('starter.controllers', [])
   this.addPee = function() {
     LogsService.add({ type: 'pee' }, 0)
     .then(function() {
-      $scope.dialogs.poop.comments = '';
       $state.go('tab.log');
     });
   };
@@ -85,7 +84,6 @@ angular.module('starter.controllers', [])
   this.addBreastFeeding = function() {
     LogsService.add({ type: 'breastFeeding' }, 0)
     .then(function() {
-      $scope.dialogs.poop.comments = '';
       $state.go('tab.log');
     });
   };
