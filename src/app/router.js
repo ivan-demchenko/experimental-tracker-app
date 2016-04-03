@@ -1,8 +1,20 @@
 import Bacon from 'baconjs'
+import Storage from './services/storage'
+import LoadingView from './components/loading'
+import LogsView from './subviews/logs'
+import InsertView from './subviews/insert'
 
-Bacon.fromEvent(document, 'hashchange').log();
+export let routerConfig = {
+  'logs': {
+    subView: LogsView,
+    data: [Storage.get('items')]
+  },
+  'insert': {
+    subView: InsertView,
+    data: []
+  }
+}
 
-let tabsSwitch = Bacon.fromEvent(document.querySelector('.nav-tabs'), 'click')
-.map(e => e.target.dataset.view)
-.doAction(x => window.location.hash = x)
-.startWith('logs').log()
+export let hash$ = Bacon.fromEvent(window, 'hashchange')
+.map(evt => evt.newURL.split('/#')[1])
+.startWith(location.hash.substr(1) || 'logs');
