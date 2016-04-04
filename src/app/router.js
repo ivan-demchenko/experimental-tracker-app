@@ -13,14 +13,12 @@ const subView = Bacon.once({
   'logs': LogsView,
   'insert': InsertView
 })
-.toProperty()
 .sampledBy(hash, (conf, hash) => conf[hash])
 
 const subViewData = Bacon.once({
   'logs': () => [Storage.get('items')],
   'insert': () => []
 })
-.toProperty()
 .sampledBy(hash, (conf, hash) => conf[hash]())
 .map(Q.all)
 .flatMap(Bacon.fromPromise)

@@ -16,9 +16,9 @@ export default class MainView extends React.Component {
     const SubView = this.props.subView;
     const data = this.props.subViewData;
     return (
-      <div>
-        <div><SubView data={data} /></div>
-        <div><NavTabs /></div>
+      <div className="app">
+        <div className="app__body"><SubView data={data} /></div>
+        <div className="app__nav"><NavTabs /></div>
       </div>
     );
   }

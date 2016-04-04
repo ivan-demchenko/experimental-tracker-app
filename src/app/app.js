@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom'
 import MainView from './pages/main'
 import Router from './router'
 
-const root = document.getElementById('app');
+const root = document.body;
 
 
 Bacon.combineTemplate({
